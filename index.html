@@ -1,75 +1,85 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RETRO TETRIS</title>
+    <title>RETRO TETRIS - OVERDRIVE EDITION</title>
     <!-- Pixel Arcade Font -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <!-- CRT Container to simulate monitor effects -->
-    <div class="crt-screen">
-        <div class="app-container">
-            <!-- Main Game Wrapper -->
-            <div class="game-wrapper" id="game-wrapper">
-                <canvas id="game-board" width="300" height="600"></canvas>
-                
-                <!-- Game Over / Pause Overlay -->
-                <div id="overlay" class="overlay">
-                    <h1 id="overlay-title" class="glow-text-magenta">TETRIS</h1>
-                    <p id="overlay-subtitle">PRESS START</p>
-                    <button id="start-btn" class="btn">INSERT COIN</button>
+<body class="theme-neon">
+<!-- CRT Container to simulate monitor effects -->
+<div class="crt-screen">
+    <div class="app-container">
+        <!-- Main Game Wrapper -->
+        <div class="game-wrapper" id="game-wrapper">
+            <canvas id="game-board" width="300" height="600"></canvas>
+
+            <!-- Game Over / Pause Overlay -->
+            <div id="overlay" class="overlay">
+                <h1 id="overlay-title" class="glow-text-magenta">TETRIS</h1>
+                <p id="overlay-subtitle">PRESS START</p>
+                <button id="start-btn" class="btn">INSERT COIN</button>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="side-panel">
+            <div class="panel-box">
+                <h2 class="glow-text-cyan">FEVER METER</h2>
+                <div class="fever-bar-container">
+                    <div id="fever-bar" class="fever-bar"></div>
                 </div>
             </div>
 
-            <!-- Side Panel -->
-            <div class="side-panel">
-                <div class="panel-box">
-                    <h2 class="glow-text-cyan">HOLD</h2>
-                    <canvas id="hold-piece-board" width="120" height="120"></canvas>
-                </div>
+            <div class="panel-box">
+                <h2 class="glow-text-cyan">HOLD</h2>
+                <canvas id="hold-piece-board" width="120" height="120"></canvas>
+            </div>
 
-                <div class="panel-box">
-                    <h2 class="glow-text-cyan">NEXT</h2>
-                    <canvas id="next-piece-board" width="120" height="120"></canvas>
-                </div>
+            <div class="panel-box">
+                <h2 class="glow-text-cyan">NEXT</h2>
+                <canvas id="next-piece-board" width="120" height="120"></canvas>
+            </div>
 
-                <div class="panel-box stats-box">
-                    <div class="stat">
-                        <span class="label">HIGH SCORE</span>
-                        <span id="high-score" class="value glow-text-yellow">000000</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">SCORE</span>
-                        <span id="score" class="value glow-text-yellow">000000</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">LEVEL</span>
-                        <span id="level" class="value glow-text-green">01</span>
-                    </div>
-                    <div class="stat">
-                        <span class="label">LINES</span>
-                        <span id="lines" class="value">000</span>
-                    </div>
+            <div class="panel-box stats-box">
+                <div class="stat">
+                    <span class="label">HIGH SCORE</span>
+                    <span id="high-score" class="value glow-text-yellow">000000</span>
                 </div>
-
-                <!-- Sound Toggle Button -->
-                <button id="sound-btn" class="btn-small">SOUND: ON</button>
-
-                <div class="controls-hint">
-                    <p>🕹️ <b>CONTROLS</b></p>
-                    <p>🔀 ⬅️ ➡️ MOVE</p>
-                    <p>🔄 ⬆️ ROTATE</p>
-                    <p>⚡ SPACE DROP</p>
-                    <p>📦 C/SHIFT HOLD</p>
-                    <p>⏸️ P PAUSE</p>
+                <div class="stat">
+                    <span class="label">SCORE</span>
+                    <span id="score" class="value glow-text-yellow">000000</span>
                 </div>
+                <div class="stat">
+                    <span class="label">LEVEL</span>
+                    <span id="level" class="value glow-text-green">01</span>
+                </div>
+                <div class="stat">
+                    <span class="label">LINES</span>
+                    <span id="lines" class="value">000</span>
+                </div>
+            </div>
+
+            <!-- Control & Toggle Buttons -->
+            <button id="sound-btn" class="btn-small">SOUND: ON</button>
+            <button id="theme-btn" class="btn-small">THEME: NEON</button>
+
+            <div class="controls-hint">
+                <p>🕹️ <b>CONTROLS</b></p>
+                <p>🔀 ⬅️ ➡️ MOVE</p>
+                <p>🔄 ⬆️ ROTATE</p>
+                <p>⚡ SPACE DROP</p>
+                <p>📦 C/SHIFT HOLD</p>
+                <p>🔥 F FEVER MODE</p>
+                <p>⏸️ P PAUSE</p>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
