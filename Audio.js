@@ -1,4 +1,4 @@
-class RetroAudio {
+class Audio {
     constructor() {
         this.ctx = null;
         this.enabled = true;
@@ -61,4 +61,6 @@ class RetroAudio {
     }
 }
 
-const audio = new RetroAudio();
+const audio = new Audio();
+
+export default audio;

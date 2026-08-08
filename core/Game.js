@@ -1,266 +1,12 @@
-/** --- PARTICLE & FLOATING TEXT ENGINE --- */
-class PixelParticle {
-    constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.vx = (Math.random() - 0.5) * 8;
-        this.vy = (Math.random() - 0.5) * 8 - 3;
-        this.gravity = 0.3;
-        this.life = 1.0;
-        this.size = Math.random() * 4 + 3;
-    }
+// src/core/Game.js
+import { BLOCK_SIZE, SHAPES, COLORS } from '../Config.js';
+import audio from '../Audio.js';
+import { Board } from '../entities/Board.js';
+import { Piece } from '../entities/Piece.js';
+import { FloatingText } from '../effects/FloatingText.js';
+import Input from "./Input.js";
 
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy += this.gravity;
-        this.life -= 0.03;
-    }
-
-    draw(ctx) {
-        ctx.save();
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-        ctx.restore();
-    }
-}
-
-class FloatingText {
-    constructor(x, y, text, color) {
-        this.x = x;
-        this.y = y;
-        this.text = text;
-        this.color = color;
-        this.life = 1.0;
-        this.vy = -1.2;
-    }
-
-    update() {
-        this.y += this.vy;
-        this.life -= 0.02;
-    }
-
-    draw(ctx) {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, this.life);
-        ctx.font = '10px "Press Start 2P"';
-        ctx.fillStyle = this.color;
-        ctx.shadowColor = '#000';
-        ctx.shadowBlur = 4;
-        ctx.fillText(this.text, this.x, this.y);
-        ctx.restore();
-    }
-}
-
-/** --- BOARD CLASS --- */
-class Board {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.grid = this.getEmptyGrid();
-    }
-
-    getEmptyGrid() {
-        return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
-    }
-
-    isValid(piece, dx = 0, dy = 0, shape = piece.shape) {
-        for (let y = 0; y < shape.length; y++) {
-            for (let x = 0; x < shape[y].length; x++) {
-                if (shape[y][x] !== 0) {
-                    const newX = piece.x + x + dx;
-                    const newY = piece.y + y + dy;
-                    if (
-                        newX < 0 || newX >= COLS ||
-                        newY >= ROWS ||
-                        (newY >= 0 && this.grid[newY][newX] !== 0)
-                    ) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    merge(piece) {
-        piece.shape.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value > 0) {
-                    this.grid[piece.y + y][piece.x + x] = value;
-                }
-            });
-        });
-    }
-
-    // Trigger explosive clearance around bomb blocks
-    triggerBombExplosion(bx, by, particles) {
-        audio.playExplosion();
-        for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-                const ex = bx + dx;
-                const ey = by + dy;
-                if (ex >= 0 && ex < COLS && ey >= 0 && ey < ROWS) {
-                    if (this.grid[ey][ex] !== 0) {
-                        const color = COLORS[this.grid[ey][ex]];
-                        for (let p = 0; p < 8; p++) {
-                            particles.push(new PixelParticle(
-                                ex * BLOCK_SIZE + BLOCK_SIZE / 2,
-                                ey * BLOCK_SIZE + BLOCK_SIZE / 2,
-                                color || '#ffaa00'
-                            ));
-                        }
-                        this.grid[ey][ex] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    clearLines(particles, spawnText) {
-        let linesCleared = 0;
-        let bombExploded = false;
-
-        for (let r = 0; r < ROWS; r++) {
-            if (this.grid[r].every(val => val > 0)) {
-                linesCleared++;
-
-                // Check for bomb block (ID: 8) in cleared line
-                for (let c = 0; c < COLS; c++) {
-                    if (this.grid[r][c] === 8) {
-                        bombExploded = true;
-                        this.triggerBombExplosion(c, r, particles);
-                    } else {
-                        // Create explosion particles for cleared row
-                        for (let p = 0; p < 4; p++) {
-                            particles.push(new PixelParticle(
-                                c * BLOCK_SIZE + Math.random() * BLOCK_SIZE,
-                                r * BLOCK_SIZE + Math.random() * BLOCK_SIZE,
-                                COLORS[this.grid[r][c]]
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-
-        // TODO: Refactor line collapse delay if animation gets laggy
-        this.grid = this.grid.filter(row => !row.every(val => val > 0));
-
-        while (this.grid.length < ROWS) {
-            this.grid.unshift(Array(COLS).fill(0));
-        }
-
-        if (bombExploded) {
-            spawnText("BOOM!", '#ff2200');
-        }
-
-        return linesCleared;
-    }
-
-    draw() {
-        this.ctx.fillStyle = '#000';
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-        this.ctx.strokeStyle = '#111122';
-        this.ctx.lineWidth = 1;
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                this.ctx.strokeRect(c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-            }
-        }
-
-        this.grid.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value > 0) {
-                    this.drawRetroBlock(x, y, COLORS[value], 1, value === 8);
-                }
-            });
-        });
-    }
-
-    drawRetroBlock(x, y, color, opacity = 1, isBomb = false) {
-        this.ctx.save();
-        this.ctx.globalAlpha = opacity;
-
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
-
-        this.ctx.strokeStyle = isBomb ? '#ffff00' : '#ffffff';
-        this.ctx.lineWidth = isBomb ? 3 : 2;
-        this.ctx.strokeRect(x * BLOCK_SIZE + 3, y * BLOCK_SIZE + 3, BLOCK_SIZE - 6, BLOCK_SIZE - 6);
-
-        if (isBomb) {
-            this.ctx.fillStyle = '#ffffff';
-            this.ctx.font = '12px "Press Start 2P"';
-            this.ctx.fillText("💣", x * BLOCK_SIZE + 6, y * BLOCK_SIZE + 21);
-        }
-
-        this.ctx.restore();
-    }
-}
-
-/** --- PIECE CLASS --- */
-class Piece {
-    constructor(ctx, shapeId) {
-        this.ctx = ctx;
-        this.colorId = shapeId;
-        this.shape = SHAPES[shapeId];
-        this.color = COLORS[shapeId];
-        this.x = Math.floor(COLS / 2) - Math.ceil(this.shape[0].length / 2);
-        this.y = 0;
-    }
-
-    draw(board) {
-        let ghostY = this.y;
-        while (board.isValid(this, 0, ghostY - this.y + 1)) {
-            ghostY++;
-        }
-
-        this.shape.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value > 0) {
-                    board.drawRetroBlock(this.x + x, ghostY + y, this.color, 0.2, this.colorId === 8);
-                    board.drawRetroBlock(this.x + x, this.y + y, this.color, 1, this.colorId === 8);
-                }
-            });
-        });
-    }
-
-    move(board, dx, dy) {
-        if (board.isValid(this, dx, dy)) {
-            this.x += dx;
-            this.y += dy;
-            return true;
-        }
-        return false;
-    }
-
-    rotate(board) {
-        const newShape = this.shape[0].map((_, i) => this.shape.map(row => row[i]).reverse());
-        let kickOffset = 0;
-
-        if (!board.isValid(this, 0, 0, newShape)) {
-            if (board.isValid(this, 1, 0, newShape)) kickOffset = 1;
-            else if (board.isValid(this, -1, 0, newShape)) kickOffset = -1;
-            else if (board.isValid(this, 2, 0, newShape)) kickOffset = 2;
-            else if (board.isValid(this, -2, 0, newShape)) kickOffset = -2;
-            else return false;
-        }
-
-        this.shape = newShape;
-        this.x += kickOffset;
-        return true;
-    }
-
-    hardDrop(board) {
-        while (this.move(board, 0, 1)) {}
-    }
-}
-
-/** --- MAIN GAME ENGINE --- */
-class Game {
+export class Game {
     constructor() {
         this.canvas = document.getElementById('game-board');
         this.ctx = this.canvas.getContext('2d');
@@ -300,14 +46,13 @@ class Game {
         this.holdPieceId = null;
         this.canHold = true;
 
-        this.initControls();
+        this.input = new Input(this);
+
         this.initButtons();
 
         this.loadHighScore();
         this.reset();
         this.board.draw();
-
-        console.log("🎮 RETRO TETRIS ENGINE READY!");
     }
 
     initButtons() {
@@ -343,7 +88,6 @@ class Game {
     }
 
     getRandomPieceId() {
-        // 10% chance to generate a special Bomb piece
         if (Math.random() < 0.10) return 8;
 
         if (this.bag.length === 0) {
@@ -397,7 +141,6 @@ class Game {
 
         const shape = SHAPES[shapeId];
         const color = COLORS[shapeId];
-
         const offsetX = (4 - shape[0].length) / 2;
         const offsetY = (4 - shape.length) / 2;
 
@@ -515,14 +258,11 @@ class Game {
 
             if (linesCleared > 0) {
                 audio.playClear();
-
-                // Screen shake on big clears
                 if (linesCleared >= 3) {
                     this.gameWrapper.classList.add('shake');
                     setTimeout(() => this.gameWrapper.classList.remove('shake'), 300);
                 }
 
-                // Dynamic floating announcer banners
                 const banners = ["", "NICE!", "DOUBLE!", "TRIPLE!", "TETRIS GOD!"];
                 if (banners[linesCleared]) {
                     this.spawnFloatingText(banners[linesCleared], linesCleared === 4 ? '#ff0055' : '#00ff66');
@@ -535,7 +275,6 @@ class Game {
             }
 
             this.piece = this.generatePiece();
-
             if (!this.board.isValid(this.piece)) {
                 this.gameOver();
             }
@@ -546,8 +285,6 @@ class Game {
     handleScore(linesCleared) {
         this.lines += linesCleared;
         const lineScores = [0, 40, 100, 300, 1200];
-
-        // 3x multiplier when Fever Mode is active
         const multiplier = this.isFeverActive ? 3 : 1;
         this.score += lineScores[linesCleared] * this.level * multiplier;
 
@@ -577,14 +314,12 @@ class Game {
         this.board.draw();
         this.piece.draw(this.board);
 
-        // Update and draw particles
         this.particles.forEach((p, idx) => {
             p.update();
             p.draw(this.ctx);
             if (p.life <= 0) this.particles.splice(idx, 1);
         });
 
-        // Update and draw floating arcade popups
         this.floatingTexts.forEach((ft, idx) => {
             ft.update();
             ft.draw(this.ctx);
@@ -593,55 +328,4 @@ class Game {
 
         this.animationId = requestAnimationFrame(this.update.bind(this));
     }
-
-    initControls() {
-        document.addEventListener('keydown', (event) => {
-            if (this.isGameOver) return;
-
-            if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyC", "KeyF", "ShiftLeft", "ShiftRight"].includes(event.code)) {
-                event.preventDefault();
-            }
-
-            if (event.key.toLowerCase() === 'p') {
-                this.pause();
-                return;
-            }
-
-            if (event.key.toLowerCase() === 'f') {
-                this.activateFever();
-                return;
-            }
-
-            if (event.key.toLowerCase() === 'c' || event.key === 'Shift') {
-                this.hold();
-                return;
-            }
-
-            if (this.isPaused) return;
-
-            switch (event.code) {
-                case 'ArrowLeft':
-                    if (this.piece.move(this.board, -1, 0)) audio.playMove();
-                    break;
-                case 'ArrowRight':
-                    if (this.piece.move(this.board, 1, 0)) audio.playMove();
-                    break;
-                case 'ArrowDown':
-                    if (this.piece.move(this.board, 0, 1)) audio.playMove();
-                    this.dropCounter = 0;
-                    break;
-                case 'ArrowUp':
-                    if (this.piece.rotate(this.board)) audio.playRotate();
-                    break;
-                case 'Space':
-                    this.piece.hardDrop(this.board);
-                    this.drop();
-                    break;
-            }
-        });
-    }
 }
-
-window.onload = () => {
-    new Game();
-};
