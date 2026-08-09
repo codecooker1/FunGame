@@ -271,7 +271,7 @@ export class Game {
                     setTimeout(() => this.gameWrapper.classList.remove('shake'), 300);
                 }
 
-                const banners = ["", "NICE!", "DOUBLE!", "TRIPLE!", "TETRIS GOD!"];
+                const banners = ["", "NICE!", "DOUBLE!", "TRIPLE!", "RETRIS GOD!"];
                 if (banners[linesCleared]) {
                     this.spawnFloatingText(banners[linesCleared], linesCleared === 4 ? '#ff0055' : '#00ff66');
                 }
