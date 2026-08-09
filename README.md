@@ -1,6 +1,6 @@
 # 🕹️ RETRO TETRIS
 
-A retro, feature-packed **etris clone** built from scratch with pure **Vanilla JavaScript**, **HTML5 Canvas**, and **CSS3**. 
+A retro, feature-packed **tetris clone** built from scratch with pure **Vanilla JavaScript**, **HTML5 Canvas**, and **CSS3**. 
 
 Designed to blend classic 1980s CRT arcade aesthetics with modern Tetris guidelines (Lock Delay, 7-Bag Randomizer, 3-Piece Lookahead, and Particle Physics).
 
@@ -14,12 +14,14 @@ Designed to blend classic 1980s CRT arcade aesthetics with modern Tetris guideli
 * **🔥 Combo & Back-to-Back Scoring:**
   * **Back-to-Back Tetris Bonus:** Extra points for consecutive 4-line clears.
   * **Combo Chain Multiplier:** Escalating score multipliers for consecutive line clears.
-  * **Retro Banner Overlays:** Real-time animated arcade popups (`TETRIS!`, `B2B TETRIS!`, `2x COMBO!`).
+  * **Retro Banner Overlays:** Real-time animated arcade popups.
+  * **Fever Meter:** Once the fever bar gets full press `f` to get a speed boost.
 * **📦 Hold Piece System:** Swap and hold pieces using `C` or `Shift`.
 * **👻 Ghost Piece:** Real-time drop preview shadow to assist precise placement.
 * **🔊 Pure Web Audio Synthesizer:** Built-in retro audio engine generating square and sawtooth wave sound effects without external sound files.
 * **📺 Retro CRT Aesthetics:** Scanline overlay, screen shake animations on 4-line clears, and neon glow typography.
 * **💾 High Score System:** Scores persist across sessions using browser `localStorage`.
+* ** Theming System:** Choose your favorite theme from 5 available themes when playing.
 
 ---
 
@@ -27,18 +29,12 @@ Designed to blend classic 1980s CRT arcade aesthetics with modern Tetris guideli
 
 | Action | Keyboard Input |
 | :--- | :--- |
-| **Move Left / Right** | `⬅️` / `➡️` (Arrow Keys) |
-| **Soft Drop** | `⬇️` (Down Arrow) |
+| **Move Left / Right** | `⬅️` / `➡️` (Arrow Keys) or `A` / `D`|
+| **Soft Drop** | `⬇️` (Down Arrow) or `S`|
 | **Hard Drop** | `Spacebar` |
-| **Rotate Piece** | `⬆️` (Up Arrow) |
+| **Rotate Piece** | `⬆️` (Up Arrow) or `W` |
 | **Hold Piece** | `C` or `Shift` |
 | **Pause / Resume** | `P` |
+| **Activate Fever** | `F` |
 
 ---
-
-## 📂 Project Structure
-
-```text
-├── index.html     # HTML structure, CRT screen container, overlays, and canvas elements
-├── style.css      # CRT scanlines, neon glows, animations, and arcade styling
-└── script.js      # Game engine, particle physics, Web Audio synth, and piece logic
