@@ -32,6 +32,10 @@ export class Game {
         this.themeBtn = document.getElementById('theme-btn');
         this.gameWrapper = document.getElementById('game-wrapper');
 
+        this.baseWidth = this.gameWrapper.offsetWidth;
+        this.baseHeight = this.gameWrapper.offsetHeight;
+        window.addEventListener('resize', () => this.handleResize());
+
         this.particles = [];
         this.floatingTexts = [];
 
@@ -39,7 +43,7 @@ export class Game {
         this.isFeverActive = false;
         this.feverTimer = null;
 
-        this.themes = ['neon', 'gameboy', 'cyberpunk'];
+        this.themes = ['neon', 'gameboy', 'cyberpunk', 'synthwave', 'vaporwave', 'hacker'];
         this.currentThemeIdx = 0;
 
         this.bag = [];
@@ -53,6 +57,8 @@ export class Game {
         this.loadHighScore();
         this.reset();
         this.board.draw();
+
+        this.handleResize();
     }
 
     initButtons() {
@@ -72,6 +78,8 @@ export class Game {
             document.body.className = `theme-${themeName}`;
             this.themeBtn.innerText = `THEME: ${themeName.toUpperCase()}`;
         });
+
+        document.addEventListener('resize', () => {this.handleResize()});
     }
 
     loadHighScore() {
@@ -327,5 +335,26 @@ export class Game {
         });
 
         this.animationId = requestAnimationFrame(this.update.bind(this));
+    }
+
+    handleResize(){
+        const appContainer = document.querySelector('.app-container');
+        if (!appContainer) return;
+
+        const width = this.baseWidth || 600;
+        const height = this.baseHeight || 850;
+
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        const scaleX = windowWidth / width;
+        const scaleY = windowHeight / height;
+
+        const scale = Math.min(scaleX, scaleY) * .95;
+
+        appContainer.style.transform = `scale(${scale})`;
+        appContainer.style.transformOrigin = `center center`;
+
+
     }
 }

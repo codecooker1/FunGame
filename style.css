@@ -31,11 +31,41 @@ body.theme-cyberpunk {
     --neon-green: #7700ff;
 }
 
+body.theme-synthwave {
+    --bg-color: #1a053a;
+    --panel-bg: #290a59;
+    --border-color: #ff007f;
+    --neon-cyan: #00e5ff;
+    --neon-magenta: #ff007f;
+    --neon-yellow: #ffaa00;
+    --neon-green: #b026ff;
+}
+
+body.theme-vaporwave {
+    --bg-color: #0b0914;
+    --panel-bg: #1a153a;
+    --border-color: #ff71ce;
+    --neon-cyan: #01cdfe;
+    --neon-magenta: #ff71ce;
+    --neon-yellow: #fffb96;
+    --neon-green: #05ffa1;
+}
+
+body.theme-hacker {
+    --bg-color: #000000;
+    --panel-bg: #001100;
+    --border-color: #00ff41;
+    --neon-cyan: #008f11;
+    --neon-magenta: #00ff41;
+    --neon-yellow: #99ff99;
+    --neon-green: #00ff41;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: var(--font-arcade);
+    font-family: var(--font-arcade), serif;
 }
 
 body {
@@ -44,9 +74,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
     overflow: hidden;
     transition: background-color 0.3s ease;
+    /*margin-top: 80px;*/
 }
 
 /* --- CRT Screen Overlay Effects --- */
@@ -149,7 +180,7 @@ canvas#game-board {
 }
 
 .fever-bar {
-    width: 0%;
+    width: 0;
     height: 100%;
     background: linear-gradient(90deg, var(--neon-yellow), var(--neon-magenta));
     box-shadow: 0 0 8px var(--neon-yellow);
